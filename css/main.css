@@ -171,6 +171,7 @@ section#project h2::after {
 
 #tasks-assigned {
     position: relative;
+    flex-grow: 1;
 }
 
 #tasks-assigned canvas {
