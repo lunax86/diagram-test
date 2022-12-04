@@ -1,0 +1,11 @@
+(v) make canvas and tasks and render them
+(v) add drag and drop for tasks
+(x) add employees with efficiency coefficient
+(x) render actual days (calendar)
+
+// NOTES:
+(x) class diagram is getting way too big - canvas functions could be separate class
+(x) pull hardcoded canvas colors above so they can be easily changed
+(x) add clickable areas to canvas
+(x) (optional) add task groups
+(x) (optional) add task lines

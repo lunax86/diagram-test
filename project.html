@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        other meta tags
+    -->
+    <title> @_webname | @_projectname</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <header>
+        <h1>Project: @_projectname</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#">home</a></li>
+            <li><a href="#" class="active">project</a></li>
+            <li><a href="#">employees</a></li>
+        </ul>
+    </nav>
+
+    <section id="project">
+
+        <h2 id="header-tasks-unassigned">Task List</h2>
+
+        <div id="tasks-unassigned">
+            <div class="task" draggable="true" data-task='{"name":"Task 1", "hours": 20}''>
+                <div class="name">Task 1</div>
+                <div class="hours">20</div>
+            </div>
+            <div class="task" draggable="true" data-task='{"name":"Task 2", "hours": 60}''>
+                <div class="name">Task 2</div>
+                <div class="hours">60</div>
+            </div>
+            <div class="task" draggable="true" data-task='{"name":"Task 3", "hours": 40}''>
+                <div class="name">Task 3</div>
+                <div class="hours">40</div>
+            </div>
+            <div class="task" draggable="true" data-task='{"name":"Task 4", "hours": 10}''>
+                <div class="name">Task 4</div>
+                <div class="hours">10</div>
+            </div>
+            <div class="task" draggable="true" data-task='{"name":"Task 5", "hours": 50}''>
+                <div class="name">Task 5</div>
+                <div class="hours">50</div>
+            </div>
+            <div class="task" draggable="true" data-task='{"name":"Task 6", "hours": 30}''>
+                <div class="name">Task 6</div>
+                <div class="hours">30</div>
+            </div>
+        </div>
+
+        <h2 id="header-tasks-assigned">Diagram</h2>
+
+        <div id="tasks-assigned">
+            <canvas id="diagram"></canvas>
+        </div>
+
+    </section>
+
+    <footer>
+        © Compu-Global-Hyper-Mega-Net Corp.
+    </footer>
+
+    <!-- js -->
+    <script src="./js/project.js"></script>
+    <script src="./js/employees.js"></script>
+    <script src="./js/diagram.js"></script>
+
+    <script src="./js/main.js"></script>
+</body>
+</html>
