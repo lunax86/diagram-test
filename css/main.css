@@ -122,7 +122,9 @@ section#project {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin: 2rem 1rem;
+    padding: 2rem 1rem;
+    margin: 0 1 rem;
+    overflow: auto;
 }
 
 section#project h2 {
@@ -147,26 +149,19 @@ section#project h2::after {
         grid-template-rows: 1.5rem 1fr;
         grid-template-columns: 15rem 1fr;
         grid-template-areas: 
-        'header-tasks header-diagram'
-        'tasks diagram'
+        'eh dh'
+        'el dc'
+        'th dc'
+        'tc dc'
         ;
     }
 
-    section#project #header-tasks-unassigned {
-        grid-area: header-tasks;
-    }
-
-    section#project #tasks-unassigned {
-        grid-area: tasks;
-    }
-
-    section#project #header-tasks-assigned {
-        grid-area: header-diagram;
-    }
-
-    section#project #tasks-assigned {
-        grid-area: diagram;
-    }
+    section#project #header-tasks-unassigned { grid-area: th; }
+    section#project #tasks-unassigned { grid-area: tc; }
+    section#project #header-tasks-assigned { grid-area: dh; }
+    section#project #tasks-assigned { grid-area: dc; }
+    section#project #employees-header { grid-area: eh; }
+    section#project #employees-list { grid-area: el; }
 }
 
 #tasks-assigned {
@@ -182,21 +177,23 @@ section#project h2::after {
     right: 0;
 }
 
-#tasks-unassigned {
+#tasks-unassigned, #employees {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    gap: 2rem;
+    justify-content: space-evenly;
+    gap: 1rem;
 }
 
 @media (min-width: 60rem) {
-    #tasks-unassigned {
+    #tasks-unassigned, #employees {
         display: flex;
+        justify-content: flex-start;
         flex-direction: column;
     }
 }
 
-#tasks-unassigned .task {
+#tasks-unassigned .task, #employees .employee {
     position: relative;
     min-width: 10rem;
     display: flex;
@@ -204,27 +201,14 @@ section#project h2::after {
     align-items: center;
     height: 2rem;
     padding: 0 1rem 0 1rem;
+    gap: 1rem;
     background-color: var(--color-dark-300);
-    border-top: 1px solid var(--color-light-700);
-    border-bottom: 1px solid var(--color-light-700);
+    user-select: none;
 }
 
-#tasks-unassigned .task.dragging {
+#tasks-unassigned .task.dragging, #employees .employee.dragging {
     background-color: var(--color-highlight);
-    border-top: 1px solid var(--color-highlight);
-    border-bottom: 1px solid var(--color-highlight);
-}
 
-#tasks-unassigned .task::after {
-    position: absolute;
-    z-index: -1;
-    content: '';
-    background-color: var(--color-highlight);
-    top: -.5rem;
-    right: .5rem;
-    bottom: -.5rem;
-    left: .5rem;
-    
 }
 
 footer {

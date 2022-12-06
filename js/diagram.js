@@ -1,200 +1,205 @@
 class Diagram
 {
 
+    colors = {
+        diagramHeaderBackground: '#222',
+        diagramHeaderText: '#eee',
+        diagramBodyBackground: '#333',
+        taskBackground: '#093',
+        taskText: '#eee',
+        text: '#093',
+        grid: '#555'
+    };
+
     constructor(canvas, project) {
-
-        this.canvas = canvas;
+  
+        this.wrap = canvas.parentElement;
         this.project = project;
-        this.columns = 30; // TODO - for now just render unknown 30 days
-
-        this.context = this.canvas.getContext('2d');
+        this.canvas = new Canvas(canvas);
+        this.calendar = new Calendar();
 
         this.render();
     }
 
-    setWidth () {
+    renderEmpty(chart) {
 
-        this.width = this.canvas.parentElement.offsetWidth;
-    }
+        const fixedHeight = 400;
 
-    setHeight () {
+        this.canvas.resize(chart.size.width, fixedHeight);
+        this.canvas.color = this.colors.diagramBodyBackground;
 
-        this.height = (this.rows + 2) * this.cellSize;
-    }
-
-    resize () {
-
-        // calculate new size values based on parent element and number of tasks
-        this.setWidth();
-        this.cellSize = this.width/this.columns;
-        this.unitSize = this.cellSize/8;
-        this.setHeight();
-
-        // apply new size values to element
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-    }
-
-    drawLine (fromWidth, fromHeight, toWidth, toHeight, color = '#fff') {
-
-        this.context.lineWidth = 1;
-        this.context.strokeStyle = color;
-
-        this.context.beginPath();
-        this.context.moveTo(Math.round(fromWidth), Math.round(fromHeight)+0.5);
-        this.context.lineTo(Math.round(toWidth), Math.round(toHeight)+0.5);
-        this.context.stroke();
-    }
-
-    drawRectangle (fromWidth, fromHeight, toWidth, toHeight, color = '#fff') {
-
-        this.context.fillStyle = color;
-        this.context.fillRect(Math.round(fromWidth), Math.round(fromHeight), Math.round(toWidth), Math.round(toHeight));
-
-    }
-
-    drawText (fromWidth, fromHeight, text, color = '#fff', centered = false) {
-
-        const fontSize = Math.round(this.unitSize*3);
-
-        this.context.font = fontSize+'px Arial';
-        if (centered) this.context.textAlign = 'center';
-            else this.context.textAlign = 'left';
-        this.context.fillStyle = color;
-        
-        //this.context.fillText(text, fromWidth+(this.cellSize/2), fromHeight+(this.cellSize/2));
-        this.context.fillText(text, fromWidth, fromHeight); 
-    }
-
-    renderHeader(timeTaken) {
-
-        const spacing = this.cellSize/4;
-
-        this.drawRectangle(0,0,this.width,this.cellSize, '#222');
-
-        this.drawRectangle(0,this.unitSize,this.width,this.cellSize-this.unitSize*2, '#333');
-
-        this.drawRectangle(0,this.cellSize-this.unitSize,timeTaken,this.unitSize, '#093');
-
-        for (let i=0; i<this.columns; i++) {
-            this.drawText(this.cellSize*i+(this.cellSize/2), this.unitSize+(this.cellSize/2), i+1, '#eee', true);
-        }
-    }
-
-    // render background
-    renderBackground () {
-
-        const spacing = this.cellSize/4;
-        const color = '#333';
-
-        // fill with solid color
-        //this.drawRectangle(0,0,this.width,this.height, color);
-
-        /* looks ugly ?
-        for (let i=0; i<this.columns; i++) {
-
-            if (i % 2 === 0) {
-                this.drawRectangle(this.cellSize*i,0,this.cellSize,this.height, color);
-            }
-        }*/
-
-        for (let i=0; i<this.columns; i++) {
-            this.drawRectangle((this.cellSize*i)+spacing,0,this.cellSize-(spacing*2),this.height, color);
-        }
-
-    }
-
-    // grid
-    renderGrid () {
-
-        const color = 'rgba(255, 255, 255, 0.8)';
-
-        for (let i=1; i<this.columns; i++) {
-
-            const hodor = i*this.cellSize;
-
-            this.drawLine(hodor, 0, hodor, this.height, color);
-        }
-
-        for (let i=1; i<(this.rows+2); i++) {
-
-            const hodor = i*this.cellSize;
-
-            this.drawLine(0, hodor, this.width, hodor, color);
-        }
-    }
-
-    renderTasks() {
-
-        let currentPosition = 0;
-        const spacing = Math.round(this.unitSize);
-
-        this.project.tasks.forEach( (task, i) => {
-
-            const taskWidth = task.hours*this.unitSize;
-
-            this.drawRectangle(
-                currentPosition,
-                ((this.cellSize*i)+spacing)+(this.cellSize),
-                taskWidth,
-                this.cellSize-spacing*2,
-                '#093');
-            currentPosition += taskWidth;
-
-            // add text
-            this.drawText(
-                currentPosition-taskWidth+this.unitSize,
-                ((this.cellSize*i)+this.cellSize)+this.unitSize+(this.cellSize/2),
-                task.name,
-                '#fff',
-                false
+        this.canvas.drawRectangle(
+            chart.size.cell,
+            chart.size.cell,
+            chart.size.width - chart.size.cell * 2,
+            fixedHeight - chart.size.cell * 2
             );
-        });
-        
-        return currentPosition;
+
+        this.canvas.color = this.colors.diagramHeaderText;
+        this.canvas.text.size = Math.round(chart.size.unit * 3) + 'px';
+        this.canvas.text.align = 'center';
+        this.canvas.drawText( chart.size.width / 2, fixedHeight / 2, 'Drag and Drop Employee Here');
     }
 
-    renderEmpty () {
+    renderHeader(chart, tasksLength) {
 
-        const width = this.canvas.parentElement.offsetWidth;
-        const height = this.canvas.parentElement.offsetHeight;
+        /*
+        this.canvas.color = this.colors.diagramHeaderBackground;
+        this.canvas.drawRectangle(0 ,0 , chart.size.width, chart.size.cell);
+        */
 
-        this.canvas.width = width;
-        this.canvas.height = height;
+        /*
+        this.canvas.color = this.colors.diagramBodyBackground;
+        this.canvas.drawRectangle(0 , chart.size.unit, chart.size.width, chart.size.cell - chart.size.unit * 2);
+        */
 
-        this.drawRectangle(this.cellSize, this.cellSize, width - this.cellSize*2, height - this.cellSize*2, '#333');
-        this.drawText(width/2, height/2, 'Drag and Drop Tasks Here', '#eee', true);
+        /*
+        this.canvas.color = this.colors.taskBackground;
+        this.canvas.drawRectangle(0 ,chart.size.cell - chart.size.unit, tasksLength, chart.size.unit);
+        */
+
+        this.canvas.color = this.colors.taskBackground;
+        this.canvas.drawRectangle(0 , chart.size.unit, tasksLength, chart.size.cell - chart.size.unit * 2 );
+
+        this.canvas.color = this.colors.diagramHeaderText;
+        this.canvas.text.size = Math.round(chart.size.unit * 3) + 'px';
+        this.canvas.text.align = 'center';
+
+        for (let i = 0; i < chart.columns; i++) {
+            this.canvas.drawText(
+                chart.size.cell * i + (chart.size.cell / 2),
+                chart.size.unit + (chart.size.cell / 2),
+                i + 1
+                );
+        }
+    }
+
+    renderTasks(chart, employees) {
+
+        // TODO this method is way too long - split !!!
+
+        let currentRow = 0;
+        let maxLength = 0;
+
+        for (let i = 0; i < employees.length; i++) {
+
+            let currentLength = 0;
+            const spacing = Math.round(chart.size.unit);
+
+            this.canvas.color = this.colors.diagramHeaderBackground;
+            this.canvas.drawRectangle(
+                0,
+                chart.size.cell * currentRow + chart.size.cell,
+                chart.size.width,
+                chart.size.cell + 2,
+                );
+
+            this.canvas.color = this.colors.diagramHeaderText;
+            this.canvas.text.size = Math.round(chart.size.unit * 3) + 'px';
+            this.canvas.text.align = 'center';
+            this.canvas.drawText(
+                chart.size.width / 2,
+                (chart.size.cell * currentRow + chart.size.cell + chart.size.unit + chart.size.cell / 2),
+                employees[i].name
+                );
+            currentRow++
+
+            employees[i].tasks.forEach( (task) => {
+
+                const taskLength = (task.hours * chart.size.unit) * employees[i].coefficient;
+
+                this.canvas.color = this.colors.text;
+                this.canvas.drawRectangle(
+                    currentLength,
+                    (chart.size.cell * currentRow + spacing ) + chart.size.cell,
+                    taskLength,
+                    chart.size.cell - spacing * 2,
+                    );
+                currentLength += taskLength;
+
+                this.canvas.color = this.colors.diagramHeaderText;
+                this.canvas.text.size = Math.round(chart.size.unit * 3) + 'px';
+                this.canvas.text.align = 'left';
+
+                this.canvas.drawText(
+                    currentLength - taskLength + chart.size.unit,
+                    (chart.size.cell * currentRow + chart.size.cell + chart.size.unit + chart.size.cell / 2),
+                    task.name,
+                    );
+
+                currentRow++;    
+            });
+
+            if (maxLength < currentLength) maxLength = currentLength;
+        }
+
+        return maxLength;
+    }
+
+    renderBackground (chart) {
+
+        const spacing = chart.size.cell / 8;
+        this.canvas.color = this.colors.diagramBodyBackground;
+
+        /*
+        for (let i = 0; i < chart.columns; i++) {
+            this.canvas.drawRectangle(
+                chart.size.cell * i + spacing,
+                0,
+                chart.size.cell - spacing * 2,
+                chart.size.height
+                );
+        }
+        */
+
+        for (let i = 0; i <= chart.rows; i++) {
+            this.canvas.drawRectangle(
+                0,
+                chart.size.cell * i + spacing,
+                chart.size.width,
+                chart.size.cell - spacing * 2
+                );
+        }
+    }
+
+    renderGrid (chart, renderColumns = true, renderRows = true) {
+
+        this.canvas.color = this.colors.grid;
+
+        if (renderColumns) {
+            for (let i = 1; i < chart.columns; i++) {
+                const temp = i * chart.size.cell;
+                this.canvas.drawLine(temp, 0, temp, chart.size.height);
+            }
+        }
+
+        if (renderRows) {
+            for (let i = 1; i < (chart.rows+1); i++) {
+                const temp = i * chart.size.cell;
+                this.canvas.drawLine(0, temp, chart.size.width, temp);
+            }
+        }
 
     }
 
     render () {
 
-        this.rows = this.project.countTasks();
+        const chart = new Chart(this.calendar.todo(), this.project.countTasks() + this.project.countEmployees(), this.wrap.offsetWidth);
 
-        // set optimal canvas size
-        this.resize();
+        this.canvas.resize(chart.size.width, chart.size.height);
+        this.canvas.clear();
 
-        // clear canvas
-        this.context.clearRect(0, 0, this.width, this.height);
-
-        // if no tasks assigned yet
-        if (this.project.countTasks() === 0) {
-            this.renderEmpty();
+        if (this.project.countEmployees() === 0) {
+            this.renderEmpty(chart);
             return;
         }
 
-        // render background
-        this.renderBackground();
+        this.renderGrid(chart);
+        this.renderBackground(chart);
 
-        // render tasks
-        const timeTaken = this.renderTasks();
-
-        // render header
-        this. renderHeader(timeTaken);
-
-        // grid ?
-        this.renderGrid();
-
+        const tasksLength = this.renderTasks(chart, this.project.employees);
+        this.renderHeader(chart, tasksLength);
+        
     }
 
 }
